@@ -78,6 +78,7 @@ setup(name='superlance',
       httpok = superlance.httpok:main
       crashsms = superlance.crashsms:main
       crashmail = superlance.crashmail:main
+      stopmailbatch = superlance.stopmailbatch:main
       crashmailbatch = superlance.crashmailbatch:main
       fatalmailbatch = superlance.fatalmailbatch:main
       memmon = superlance.memmon:main
