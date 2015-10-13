@@ -91,11 +91,11 @@ class ProcessStateEmailMonitor(ProcessStateMonitor):
 
         self.from_email = kwargs['from_email']
         self.to_emails = kwargs['to_emails']
-        self.subject = kwargs.get('subject')
+        self.subject = kwargs.get('subject', 'Alert from Supervisord')
         self.smtp_host = kwargs.get('smtp_host', 'localhost')
         self.smtp_user = kwargs.get('smtp_user')
         self.smtp_password = kwargs.get('smtp_password')
-        self.digest_len = 76
+        self.digest_len = 80
 
     def send_batch_notification(self):
         email = self.get_batch_email()

@@ -55,31 +55,33 @@ from supervisor import childutils
 from superlance.process_state_email_monitor import ProcessStateEmailMonitor
 
 
-class CrashMailBatch(ProcessStateEmailMonitor):
+class StopMailBatch(ProcessStateEmailMonitor):
 
     process_state_events = ['PROCESS_STATE_STOPPING', 'PROCESS_STATE_STOPPED', 'PROCESS_STATE_UNKNOWN']
+    output_logs = {
+        'PROCESS_STATE_STOPPING': 'Process {groupname}:{processname} (pid {pid}) stopping',
+        'PROCESS_STATE_STOPPED': 'Process {groupname}:{processname} (pid {pid}) stopped',
+        'PROCESS_STATE_UNKNOWN': 'Process {groupname}:{processname} (pid {pid}) unknown'
+    }
 
     def __init__(self, **kwargs):
         kwargs['subject'] = kwargs.get('subject',
-                                       'Crash alert from supervisord')
+                                       'Stop alert from supervisord')
+
         ProcessStateEmailMonitor.__init__(self, **kwargs)
         self.now = kwargs.get('now', None)
 
     def get_process_state_change_msg(self, headers, payload):
-        pheaders, pdata = childutils.eventdata(payload+'\n')
+        pheaders, pdata = childutils.eventdata(payload + '\n')
 
-        # commenting this out to catch all STOPPED transitions
-        # if int(pheaders['expected']):
-        #     return None
-
-        txt = 'Process %(groupname)s:%(processname)s (pid %(pid)s) \
-stopped' % pheaders
-        return '%s -- %s' % (childutils.get_asctime(self.now), txt)
+        return '{0} -- {1}'.format(
+            childutils.get_asctime(self.now), 
+            self.output_logs[headers['eventname']].format(**pheaders))
 
 
 def main():
-    crash = CrashMailBatch.create_from_cmd_line()
-    crash.run()
+    stop = StopMailBatch.create_from_cmd_line()
+    stop.run()
 
 
 if __name__ == '__main__':
